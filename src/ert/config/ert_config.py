@@ -371,16 +371,20 @@ class ErtConfig:
             for key, val in args:
                 job.private_args[key] = val
 
+            should_add_job = True
+
             if job.required_keywords:
                 for req in job.required_keywords:
                     if req not in job.private_args:
                         errors.append(
                             ConfigValidationError.with_context(
                                 f"FORWARD MODEL Required keyword {req} not found for forward model {job_name}",
-                                req,
+                                job_name,
                             )
                         )
-            else:
+                        should_add_job = False
+
+            if should_add_job:
                 jobs.append(job)
 
         for job_description in config_dict.get(ConfigKeys.SIMULATION_JOB, []):
@@ -397,16 +401,20 @@ class ErtConfig:
                 continue
             job.arglist = job_description[1:]
 
+            should_add_job = True
+
             if job.required_keywords:
                 for req in job.required_keywords:
                     if req not in job.private_args:
                         errors.append(
                             ConfigValidationError.with_context(
                                 f"SIM JOB Required keyword {req} not found for forward model",
-                                req,
+                                job.name,
                             )
                         )
-            else:
+                        should_add_job = False
+
+            if should_add_job:
                 jobs.append(job)
 
         if errors:

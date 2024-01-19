@@ -32,7 +32,7 @@ class ForwardModel:
     min_arg: Optional[int] = None
     max_arg: Optional[int] = None
     arglist: List[str] = field(default_factory=list)
-    required_keywords: List[str] = field(default_factory=dict)
+    required_keywords: List[str] = field(default_factory=list)
     arg_types: List[SchemaItemType] = field(default_factory=list)
     environment: Dict[str, str] = field(default_factory=dict)
     exec_env: Dict[str, str] = field(default_factory=dict)

@@ -370,7 +370,19 @@ class ErtConfig:
             job.private_args = SubstitutionList()
             for key, val in args:
                 job.private_args[key] = val
-            jobs.append(job)
+
+            if job.required_keywords:
+                for req in job.required_keywords:
+                    if req not in job.private_args:
+                        errors.append(
+                            ConfigValidationError.with_context(
+                                f"FORWARD MODEL Required keyword {req} not found for forward model {job_name}",
+                                req,
+                            )
+                        )
+            else:
+                jobs.append(job)
+
         for job_description in config_dict.get(ConfigKeys.SIMULATION_JOB, []):
             try:
                 job = copy.deepcopy(installed_jobs[job_description[0]])
@@ -384,7 +396,18 @@ class ErtConfig:
                 )
                 continue
             job.arglist = job_description[1:]
-            jobs.append(job)
+
+            if job.required_keywords:
+                for req in job.required_keywords:
+                    if req not in job.private_args:
+                        errors.append(
+                            ConfigValidationError.with_context(
+                                f"SIM JOB Required keyword {req} not found for forward model",
+                                req,
+                            )
+                        )
+            else:
+                jobs.append(job)
 
         if errors:
             raise ConfigValidationError.from_collected(errors)
@@ -496,6 +519,10 @@ class ErtConfig:
                         for arg in job.arglist
                     ],
                     "environment": substituter.filter_env_dict(job.environment),
+                    "required_keywords": [
+                        handle_default(job, substituter.substitute(rk))
+                        for rk in job.required_keywords
+                    ],
                     "exec_env": substituter.filter_env_dict(job.exec_env),
                     "max_running_minutes": job.max_running_minutes,
                     "min_arg": job.min_arg,

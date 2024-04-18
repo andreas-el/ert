@@ -1,6 +1,7 @@
 from unittest.mock import Mock
 
 import pytest
+from PyQt5.QtWidgets import QCheckBox
 
 from ert.enkf_main import EnKFMain
 from ert.gui.main import GUILogHandler, _setup_main_window
@@ -82,3 +83,42 @@ def test_that_all_snake_oil_visualisations_matches_snapshot(
 
         inner()
         plot_window.close()
+
+
+def test_that_all_plotter_filter_boxes_yield_expected_filter_results(
+    qtbot, monkeypatch, enkf_main_snake_oil, storage
+):
+    args_mock = Mock()
+    args_mock.config = "snake_oil.ert"
+
+    monkeypatch.setenv("ERT_STORAGE_RES_CONFIG", args_mock.config)
+
+    with StorageService.init_service(
+        project=storage.path,
+    ):
+        gui = _setup_main_window(
+            enkf_main_snake_oil, args_mock, GUILogHandler(), storage
+        )
+        gui.notifier.set_storage(storage)
+        qtbot.addWidget(gui)
+
+        plot_tool = gui.tools["Create plot"]
+        plot_tool.trigger()
+
+        qtbot.waitUntil(lambda: gui.findChild(PlotWindow) is not None)
+        plot_window = gui.findChild(PlotWindow)
+
+        key_list = plot_window.findChild(DataTypeKeysWidget).data_type_keys_widget
+        item_count = [3, 10, 44]
+
+        assert key_list.model().rowCount() == sum(item_count)
+        cbs = plot_window.findChildren(QCheckBox, "FilterCheckBox")
+
+        for i in range(len(item_count)):
+            for u, cb in enumerate(cbs):
+                cb.setChecked(i == u)
+
+            assert key_list.model().rowCount() in item_count
+
+        plot_window.close()
+

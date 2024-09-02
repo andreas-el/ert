@@ -187,6 +187,7 @@ def test_that_run_dialog_can_be_closed_after_used_to_open_plots(qtbot, storage):
         gui = _setup_main_window(ert_config, args_mock, GUILogHandler(), storage)
         qtbot.addWidget(gui)
         simulation_mode = get_child(gui, QComboBox, name="experiment_type")
+        simulation_mode.setCurrentIndex(0)
         run_experiment = get_child(gui, QToolButton, name="run_experiment")
 
         qtbot.mouseClick(run_experiment, Qt.LeftButton)
@@ -831,3 +832,4 @@ def test_validation_of_experiment_names_in_run_models(
 
         experiment_field.setText("ensemble_experiment")
         assert not run_experiment.isEnabled()
+

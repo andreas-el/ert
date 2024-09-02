@@ -17,7 +17,6 @@ from qtpy.QtWidgets import (
     QCheckBox,
     QFrame,
     QHBoxLayout,
-    QLabel,
     QMessageBox,
     QStackedWidget,
     QStyle,
@@ -51,6 +50,7 @@ if TYPE_CHECKING:
 
 EXPERIMENT_READY_TO_RUN_BUTTON_MESSAGE = "Run Experiment"
 EXPERIMENT_IS_RUNNING_BUTTON_MESSAGE = "Experiment running..."
+EXPERIMENT_IS_MANUAL_UPDATE_MESSAGE = "Execute Selected"
 
 
 def create_md_table(kv: Dict[str, str], output: str) -> str:
@@ -89,9 +89,6 @@ class ExperimentPanel(QWidget):
 
         experiment_type_layout = QHBoxLayout()
         experiment_type_layout.addSpacing(10)
-        experiment_type_layout.addWidget(
-            QLabel("Experiment type:"), 0, Qt.AlignmentFlag.AlignVCenter
-        )
         experiment_type_layout.addWidget(
             self._experiment_type_combo, 0, Qt.AlignmentFlag.AlignVCenter
         )
@@ -157,7 +154,7 @@ class ExperimentPanel(QWidget):
             ),
             experiment_type_valid,
         )
-
+        self._experiment_type_combo.setCurrentIndex(1)
         self.setLayout(layout)
 
     def addExperimentConfigPanel(
@@ -168,7 +165,9 @@ class ExperimentPanel(QWidget):
         experiment_type = panel.get_experiment_type()
         self._experiment_widgets[experiment_type] = panel
         self._experiment_type_combo.addDescriptionItem(
-            experiment_type.name(), experiment_type.description()
+            experiment_type.name(),
+            experiment_type.description(),
+            experiment_type.group(),
         )
 
         if not mode_enabled:
@@ -312,12 +311,21 @@ class ExperimentPanel(QWidget):
             widget = self._experiment_widgets[self.get_current_experiment_type()]
             self._experiment_stack.setCurrentWidget(widget)
             self.validationStatusChanged()
+            if self.run_button.text() != EXPERIMENT_IS_RUNNING_BUTTON_MESSAGE:
+                if current_model.name() == "Manual update":
+                    self.run_button.setText(EXPERIMENT_IS_MANUAL_UPDATE_MESSAGE)
+                else:
+                    self.run_button.setText(EXPERIMENT_READY_TO_RUN_BUTTON_MESSAGE)
             self.experiment_type_changed.emit(widget)
 
     def validationStatusChanged(self) -> None:
         widget = self._experiment_widgets[self.get_current_experiment_type()]
         self.run_button.setEnabled(
-            self.run_button.text() == EXPERIMENT_READY_TO_RUN_BUTTON_MESSAGE
+            self.run_button.text()
+            in [
+                EXPERIMENT_READY_TO_RUN_BUTTON_MESSAGE,
+                EXPERIMENT_IS_MANUAL_UPDATE_MESSAGE,
+            ]
             and widget.isConfigurationValid()
         )
 

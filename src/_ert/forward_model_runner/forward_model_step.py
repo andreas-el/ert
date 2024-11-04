@@ -430,7 +430,7 @@ def _get_processtree_data(
     process: Process,
 ) -> Tuple[int, float, Optional[int]]:
     """Obtain the oom_score (the Linux kernel uses this number to
-    decide which process to kill first in out-of-memory siturations).
+    decide which process to kill first in out-of-memory situations).
 
     Since the process being monitored here can have subprocesses using
     arbitrary memory amounts, we need to track the maximal oom_score for x

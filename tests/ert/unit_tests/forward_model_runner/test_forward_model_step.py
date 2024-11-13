@@ -1,6 +1,7 @@
 import contextlib
 import os
 import pathlib
+import random
 import stat
 import sys
 import textwrap
@@ -43,7 +44,7 @@ def test_run_with_process_failing(mock_process, mock_popen, mock_check_executabl
         next(run)
 
 
-@pytest.mark.flaky(reruns=10)
+# @pytest.mark.flaky(reruns=10)
 @pytest.mark.integration_test
 @pytest.mark.usefixtures("use_tmpdir")
 def test_cpu_seconds_can_detect_multiprocess():
@@ -64,34 +65,39 @@ def test_cpu_seconds_can_detect_multiprocess():
                 """\
             import time
             now = time.time()
-            while time.time() < now + 2:
+            while time.time() < now + 5:
                 pass"""
             )
         )
-    scriptname = "saturate_cpus.sh"
+    r = random.randint(1, 1000)
+    scriptname = f"saturate_cpus_{r}.sh"
     with open(scriptname, "w", encoding="utf-8") as script:
         script.write(
             textwrap.dedent(
                 """\
             #!/bin/sh
             python busy.py &
+            python busy.py &
+            python busy.py &
+            python busy.py &
             python busy.py"""
             )
         )
     executable = os.path.realpath(scriptname)
     os.chmod(scriptname, stat.S_IRWXU | stat.S_IRWXO | stat.S_IRWXG)
+
     fmstep = ForwardModelStep(
         {
             "executable": executable,
         },
         0,
     )
-    fmstep.MEMORY_POLL_PERIOD = 0.05
+    fmstep.MEMORY_POLL_PERIOD = 0.01
     cpu_seconds = 0.0
     for status in fmstep.run():
         if isinstance(status, Running):
             cpu_seconds = max(cpu_seconds, status.memory_status.cpu_seconds)
-    assert 2.5 < cpu_seconds < 4.5
+    assert 23 < cpu_seconds < 27
 
 
 @pytest.mark.integration_test

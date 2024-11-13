@@ -483,4 +483,4 @@ def _get_processtree_data(
             ), child.oneshot():
                 memory_rss += child.memory_info().rss
                 cpu_seconds += child.cpu_times().user
-    return (memory_rss, cpu_seconds, oom_score)
+    return memory_rss, cpu_seconds, oom_score

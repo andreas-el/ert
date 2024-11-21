@@ -77,7 +77,8 @@ class RealizationWidget(QWidget):
 
         first_real = self._real_list_model.index(0, 0)
         selection_model = self._real_view.selectionModel()
-        selection_model.select(first_real, QItemSelectionModel.SelectionFlag.Select)
+        if first_real.isValid():
+            selection_model.select(first_real, QItemSelectionModel.SelectionFlag.Select)
 
     def clearSelection(self) -> None:
         self._real_view.clearSelection()

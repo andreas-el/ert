@@ -98,11 +98,9 @@ class FMStepOverview(QTableView):
             # Only last section should be stretch
             horizontal_header.setSectionResizeMode(
                 section,
-                (
-                    QHeaderView.Stretch
-                    if section == horizontal_header.count() - 1
-                    else QHeaderView.Interactive
-                ),
+                QHeaderView.Stretch
+                if section == horizontal_header.count() - 1
+                else QHeaderView.Interactive,
             )
 
         vertical_header = self.verticalHeader()
@@ -313,8 +311,8 @@ class RunDialog(QFrame):
 
             widget = RealizationWidget(iter_row)
             widget.setSnapshotModel(self._snapshot_model)
-            widget.currentChanged.connect(self._select_real)
-            widget.currentChanged.emit(widget._real_list_model.index(0, 0))
+            widget.itemClicked.connect(self._select_real)
+            widget.itemClicked.emit(widget._real_list_model.index(0, 0))
             tab_index = self._tab_widget.addTab(
                 widget, f"Realizations for iteration {index.internalPointer().id_}"
             )

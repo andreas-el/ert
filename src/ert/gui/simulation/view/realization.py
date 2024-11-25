@@ -149,8 +149,8 @@ class RealizationDelegate(QStyledItemDelegate):
     def sizeHint(self, option: QStyleOptionViewItem, index: QModelIndex) -> QSize:
         return self._size
 
-    def eventFilter(self, object: Optional[QObject], event: Optional[QEvent]) -> bool:
-        if event.type() == QEvent.Type.ToolTip:  # type: ignore
+    def eventFilter(self, object: QObject, event: QEvent) -> bool:
+        if event.type() == QEvent.Type.ToolTip:
             mouse_pos = event.pos() + self.adjustment_point_for_job_rect_margin  # type: ignore
             parent: RealizationWidget = self.parent()  # type: ignore
             view = parent._real_view

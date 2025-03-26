@@ -136,7 +136,7 @@ class ErtMainWindow(QMainWindow):
         self.vbox_layout.addStretch()
         self.central_layout.addWidget(self.side_frame)
 
-        self.central_widget.setMinimumWidth(1500)
+        self.central_widget.setMinimumWidth(1547)
         self.central_widget.setMinimumHeight(800)
         self.setCentralWidget(self.central_widget)
 

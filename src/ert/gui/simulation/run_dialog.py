@@ -241,7 +241,7 @@ class RunDialog(QFrame):
         self._progress_widget = ProgressWidget()
 
         self._tab_widget = QTabWidget(self)
-        self._tab_widget.setMinimumHeight(250)
+        self._tab_widget.setMinimumHeight(243)
         self._tab_widget.currentChanged.connect(self._current_tab_changed)
         self._snapshot_model.rowsInserted.connect(self.on_snapshot_new_iteration)
 

@@ -78,11 +78,6 @@ def _configure_loggers(
                 "level": logging_level,
                 "propagate": False,
             },
-            "ert.scheduler.job": {
-                "handlers": ["forward_models_log"],
-                "propagate": False,
-                "level": logging_level,
-            },
         },
         "formatters": {
             "default": {"format": DEFAULT_LOGGING_FORMAT},

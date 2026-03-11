@@ -31,6 +31,8 @@ class ValuesOverIterationsPlot:
     i.e., objective or control name) which is treated as the value to plot.
     """
 
+    LEGENDS_THRESHOLD = 5
+
     def __init__(self) -> None:
         self.dimensionality = 2
         self.requires_observations = False
@@ -127,6 +129,9 @@ class ValuesOverIterationsPlot:
                 markersize=4,
             )
             config.addLegendItem(f"Realization {int(realization)}", lines[0])
+
+        if len(realizations) <= ValuesOverIterationsPlot.LEGENDS_THRESHOLD:
+            axes.legend(title="Realization")
 
         axes.xaxis.set_major_locator(MaxNLocator(integer=True))
         PlotTools.finalizePlot(

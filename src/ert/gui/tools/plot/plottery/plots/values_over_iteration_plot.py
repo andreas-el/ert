@@ -32,16 +32,22 @@ class ValuesOverIterationsPlot:
     i.e., objective or control name) which is treated as the value to plot.
     """
 
+    LEGEND_THRESHOLD = 5
+
     def __init__(self) -> None:
         self.dimensionality = 2
         self.requires_observations = False
         self._axes: Axes | None = None
         self.is_improvement = False
+        self._legend_count = 0
 
     def update_legend(self, line: Line2D) -> None:
-        if self._axes is None or self.is_improvement:
-            return
-        self._axes.legend(handles=[line], labels=[line.get_label()])
+        if (
+            self._axes
+            and not self.is_improvement
+            and self._legend_count > ValuesOverIterationsPlot.LEGEND_THRESHOLD
+        ):
+            self._axes.legend(handles=[line], labels=[line.get_label()])
 
     def plot(
         self,
@@ -118,6 +124,7 @@ class ValuesOverIterationsPlot:
         )
 
         realizations = sorted(combined["realization"].unique())
+        self._legend_count = len(realizations)
 
         # This loop is the reason batch controls
         # plot multiple identical plots for each realization.
@@ -149,4 +156,8 @@ class ValuesOverIterationsPlot:
             default_x_label="Iteration",
             default_y_label="Value",
         )
+        
+        if self._legend_count <= ValuesOverIterationsPlot.LEGEND_THRESHOLD:
+            self._axes.legend()
+
         figure.tight_layout()

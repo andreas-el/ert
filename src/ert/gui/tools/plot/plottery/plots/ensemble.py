@@ -21,10 +21,13 @@ if TYPE_CHECKING:
 
 
 class EnsemblePlot:
+    LEGEND_THRESHOLD = 5
+
     def __init__(self) -> None:
         self.dimensionality = 2
         self.requires_observations = False
         self._axes: Axes | None = None
+        self._legend_count = 0
 
     def plot(
         self,
@@ -56,6 +59,7 @@ class EnsemblePlot:
                     plot_context.deactivateDateSupport()
                     plot_context.x_axis = plot_context.INDEX_AXIS
                 config.setCurrentColor(color_index)
+                self._legend_count += len(data.columns)
                 self._plotLines(
                     axes,
                     config,
@@ -79,9 +83,8 @@ class EnsemblePlot:
         )
 
     def update_legend(self, line: Line2D) -> None:
-        if self._axes is None:
-            return
-        self._axes.legend(handles=[line], labels=[line.get_label()])
+        if self._axes and self._legend_count > EnsemblePlot.LEGEND_THRESHOLD:
+            self._axes.legend(handles=[line], labels=[line.get_label()])
 
     @staticmethod
     def _plotLines(
@@ -117,5 +120,8 @@ class EnsemblePlot:
             zorder=zorder,
         )
 
-        for line, col in zip(lines, data.columns, strict=True):
-            line.set_label(f"Realization {col}")
+        if len(lines) <= EnsemblePlot.LEGEND_THRESHOLD:
+            plot_config.addLegendItem(ensemble_label, lines[0])
+        else:
+            for line, col in zip(lines, data.columns, strict=True):
+                line.set_label(f"Realization {col}")

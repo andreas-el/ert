@@ -185,7 +185,7 @@ class PlotWidget(QWidget):
 
         for line in event.inaxes.get_lines():
             contains, _ = line.contains(event)
-            if contains and "Realization" in str(line.get_label()):
+            if contains:
                 self._plotter.update_legend(line)
                 self._canvas.draw_idle()
                 break

@@ -38,13 +38,11 @@ class ValuesOverIterationsPlot:
         self.dimensionality = 2
         self.requires_observations = False
         self._axes: Axes | None = None
-        self.is_improvement = False
         self._legend_count = 0
 
     def update_legend(self, line: Line2D) -> None:
         if (
             self._axes
-            and not self.is_improvement
             and self._legend_count > ValuesOverIterationsPlot.LEGEND_THRESHOLD
         ):
             self._axes.legend(handles=[line], labels=[line.get_label()])
@@ -59,7 +57,6 @@ class ValuesOverIterationsPlot:
         obs_loc: npt.NDArray[np.float32] | None,
         key_def: PlotApiKeyDefinition | None = None,
     ) -> None:
-        self.is_improvement = False
         config = plot_context.plotConfig()
         self._axes = figure.add_subplot(111)
 
@@ -75,7 +72,6 @@ class ValuesOverIterationsPlot:
         combined = pd.concat(all_dfs, ignore_index=True)
 
         if "is_improvement" in combined.columns:
-            self.is_improvement = True
             value_col = next(
                 c
                 for c in combined.columns
@@ -146,9 +142,6 @@ class ValuesOverIterationsPlot:
                 markersize=4,
             )
             config.addLegendItem(f"Realization {int(realization)}", lines[0])
-
-        if len(realizations) <= ValuesOverIterationsPlot.LEGEND_THRESHOLD:
-            self._axes.legend(title="Realization")
 
         self._axes.xaxis.set_major_locator(MaxNLocator(integer=True))
         PlotTools.finalizePlot(

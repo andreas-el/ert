@@ -96,7 +96,9 @@ class ValuesOverIterationsPlot:
             colors = [
                 "red" if not row.is_improvement else color for _, row in data.iterrows()
             ]
-            self._axes.scatter(data["batch_id"], data[value_col], c=colors, s=20, zorder=5)
+            self._axes.scatter(
+                data["batch_id"], data[value_col], c=colors, s=20, zorder=5
+            )
 
             config.addLegendItem("Accepted", lines[0])
             config.addLegendItem(
@@ -110,7 +112,7 @@ class ValuesOverIterationsPlot:
             PlotTools.finalizePlot(
                 plot_context,
                 figure,
-                axes,
+                self._axes,
                 default_x_label="Iteration",
                 default_y_label="Value",
             )
@@ -145,19 +147,16 @@ class ValuesOverIterationsPlot:
             )
             config.addLegendItem(f"Realization {int(realization)}", lines[0])
 
-        if len(realizations) <= ValuesOverIterationsPlot.LEGENDS_THRESHOLD:
-            axes.legend(title="Realization")
+        if len(realizations) <= ValuesOverIterationsPlot.LEGEND_THRESHOLD:
+            self._axes.legend(title="Realization")
 
-        axes.xaxis.set_major_locator(MaxNLocator(integer=True))
+        self._axes.xaxis.set_major_locator(MaxNLocator(integer=True))
         PlotTools.finalizePlot(
             plot_context,
             figure,
-            axes,
+            self._axes,
             default_x_label="Iteration",
             default_y_label="Value",
         )
-        
-        if self._legend_count <= ValuesOverIterationsPlot.LEGEND_THRESHOLD:
-            self._axes.legend()
 
         figure.tight_layout()
